@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Sign In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== PARTICLES BACKGROUND ===== */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 212, 255, 0.4);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+            animation: particleFloat 12s ease-in infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) translateX(var(--tx));
+            }
+        }
+
+        /* ===== CONTAINER ===== */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* ===== LOGIN BOX ===== */
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(15, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            animation: slideIn 0.6s ease-out;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== LOGO ===== */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+        }
+
+        .logo-tagline {
+            font-size: 0.8rem;
+            color: #808080;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== HEADING ===== */
+        .login-heading {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        /* ===== FORM ===== */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #606080;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: #00d4ff;
+        }
+
+        .forgot-link {
+            color: #00d4ff;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .forgot-link:hover {
+            color: #ffffff;
+        }
+
+        /* ===== SIGN IN BUTTON ===== */
+        .signin-btn {
+            padding: 1rem;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            border: none;
+            border-radius: 10px;
+            color: #0f0f1e;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+            text-transform: uppercase;
+        }
+
+        .signin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .signin-btn:active {
+            transform: translateY(0);
+        }
+
+        .signin-btn:disabled {
+            background: rgba(148, 163, 184, 0.18);
+            color: #aab4c3;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .signin-btn:disabled:hover {
+            background: rgba(148, 163, 184, 0.18);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .form-group[hidden],
+        #googleSignInButton[hidden] {
+            display: none;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: #606080;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        /* ===== OAUTH BUTTONS ===== */
+        .oauth-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .oauth-btn {
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .oauth-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .oauth-icon {
+            font-size: 1rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .text-action {
+            padding: 0;
+            border: 0;
+            background: none;
+            color: #00d4ff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .text-action:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .oauth-btn {
+            width: 100%;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #b0b0b0;
+        }
+
+        .signup-link {
+            color: #00d4ff;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .signup-link:hover {
+            color: #ffffff;
+        }
+
+        /* ===== ERROR MESSAGE ===== */
+        .error-message {
+            padding: 0.75rem;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            border-radius: 8px;
+            color: #ff3b30;
+            font-size: 0.85rem;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ===== SUCCESS MESSAGE ===== */
+        .success-message {
+            padding: 0.75rem;
+            background: rgba(52, 199, 89, 0.1);
+            border: 1px solid rgba(52, 199, 89, 0.3);
+            border-radius: 8px;
+            color: #34c759;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .signin-btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .signin-btn.loading .button-text {
+            display: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 1.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+
+            .login-title {
+                font-size: 1.2rem;
+            }
+
+            .oauth-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        :root {
+            color-scheme: dark;
+            --surface: #111c2e;
+            --surface-raised: #17243a;
+            --border: #293a51;
+            --text: #edf3fa;
+            --muted: #9aa9bd;
+            --accent: #65b9c4;
+        }
+
+        body {
+            background: #0b1220;
+            color: var(--text);
+        }
+
+        .particles {
+            display: none;
+        }
+
+        .login-container {
+            padding: 1.5rem;
+        }
+
+        .login-box {
+            max-width: 440px;
+            padding: clamp(1.75rem, 5vw, 2.5rem);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+            backdrop-filter: none;
+            animation: none;
+        }
+
+        .logo-icon {
+            display: none;
+        }
+
+        .login-logo {
+            margin-bottom: 1.75rem;
+        }
+
+        .logo-text {
+            color: var(--text);
+            background: none;
+            -webkit-text-fill-color: currentColor;
+            letter-spacing: 0.14em;
+        }
+
+        .logo-tagline {
+            color: var(--muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+        }
+
+        .login-title {
+            color: var(--text);
+        }
+
+        .login-subtitle,
+        label {
+            color: var(--muted);
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            border-color: var(--border);
+            border-radius: 9px;
+            background: #0d1727;
+            color: var(--text);
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #6f8097;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--accent);
+            background: #0d1727;
+            box-shadow: 0 0 0 3px rgba(101, 185, 196, 0.14);
+        }
+
+        .signin-btn {
+            border-radius: 9px;
+            background: var(--accent);
+            color: #08161c;
+            letter-spacing: 0.04em;
+            box-shadow: none;
+        }
+
+        .signin-btn:hover {
+            background: #83cbd3;
+            box-shadow: none;
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            color: #7889a0;
+        }
+
+        .divider-line {
+            background: var(--border);
+        }
+
+        .oauth-btn {
+            border-color: var(--border);
+            border-radius: 9px;
+            background: var(--surface-raised);
+            color: #d7e1ed;
+        }
+
+        .oauth-btn:hover {
+            border-color: var(--accent);
+            background: #1b2b41;
+            color: var(--text);
+        }
+
+        .forgot-link,
+        .text-action,
+        .signup-link {
+            color: var(--accent);
+        }
+
+        .forgot-link:hover,
+        .text-action:hover,
+        .signup-link:hover {
+            color: #a1dce2;
+        }
+
+        .error-message,
+        .success-message {
+            border-radius: 9px;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1rem;
+            }
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 5;
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--text);
+            font: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        [data-theme="light"] body {
+            background: #f3f6fa;
+            color: #172438;
+        }
+
+        [data-theme="light"] .login-box {
+            border-color: #dce4ed;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(31, 53, 79, 0.12);
+        }
+
+        [data-theme="light"] .logo-text,
+        [data-theme="light"] .login-title {
+            color: #172438;
+        }
+
+        [data-theme="light"] .logo-tagline,
+        [data-theme="light"] .login-subtitle,
+        [data-theme="light"] label {
+            color: #627287;
+        }
+
+        [data-theme="light"] input[type="email"],
+        [data-theme="light"] input[type="password"] {
+            border-color: #d3dce7;
+            background: #f8fafc;
+            color: #172438;
+        }
+
+        [data-theme="light"] input[type="email"]::placeholder,
+        [data-theme="light"] input[type="password"]::placeholder {
+            color: #8795a7;
+        }
+
+        [data-theme="light"] input[type="email"]:focus,
+        [data-theme="light"] input[type="password"]:focus {
+            border-color: #478f9a;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(71, 143, 154, 0.14);
+        }
+
+        [data-theme="light"] .signin-btn {
+            background: #71bdc6;
+            color: #102b30;
+        }
+
+        [data-theme="light"] .signin-btn:hover {
+            background: #8acbd2;
+        }
+
+        [data-theme="light"] .oauth-btn {
+            border-color: #d3dce7;
+            background: #f5f8fb;
+            color: #34465d;
+        }
+
+        [data-theme="light"] .oauth-btn:hover {
+            border-color: #478f9a;
+            background: #eef6f7;
+            color: #1f5962;
+        }
+
+        [data-theme="light"] .divider {
+            color: #77869a;
+        }
+
+        [data-theme="light"] .divider-line {
+            background: #dce4ed;
+        }
+
+        [data-theme="light"] .forgot-link,
+        [data-theme="light"] .text-action,
+        [data-theme="light"] .signup-link,
+        [data-theme="light"] .login-footer a {
+            color: #287785 !important;
+        }
+
+        [data-theme="light"] .theme-toggle {
+            border-color: #d2dce7;
+            background: #fff;
+            color: #26384e;
+        }
+
+        [data-theme="light"] .success-message {
+            color: #21774b;
+            background: #edf8f1;
+            border-color: #c6e8d2;
+        }
+
+        [data-theme="light"] .error-message {
+            color: #a33333;
+            background: #fff1f0;
+            border-color: #f0cdca;
+        }
+
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">☀️ Light mode</button>
+    <!-- PARTICLES BACKGROUND -->
+    <div class="particles" id="particlesContainer"></div>
+
+    <!-- LOGIN CONTAINER -->
+    <div class="login-container">
+        <div class="login-box">
+            <!-- LOGO -->
+            <div class="login-logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">NEXUS</div>
+                <div class="logo-tagline">Connect • Remember • Understand</div>
+            </div>
+
+            <!-- HEADING -->
+            <div class="login-heading">
+                <div class="login-title">Welcome to NEXUS</div>
+                <div class="login-subtitle">Sign in or create your private workspace account</div>
+            </div>
+
+            <!-- MESSAGES -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <form class="login-form" id="accountForm">
+                <div class="form-group" id="nameGroup" hidden>
+                    <label for="name">Your name</label>
+                    <input type="text" id="name" name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Alex Morgan">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" autocomplete="email" maxlength="254" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" minlength="10" maxlength="128" required placeholder="At least 10 characters">
+                </div>
+                <button class="signin-btn" id="submitButton" type="submit">
+                    <span class="button-text">Sign in</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p id="modePrompt">New to NEXUS? <button class="text-action" id="modeToggle" type="button">Create an account</button></p>
+                <button class="oauth-btn" id="googleSignInButton" type="button" hidden>Continue with Google (optional)</button>
+                <p style="margin-top:1rem;font-size:0.85rem;">
+                    <a href="/start" style="color:#67e8f9;text-decoration:none;">← Back to the NEXUS introduction</a>
+                    <span aria-hidden="true"> · </span>
+                    <a href="/README.md" style="color:#67e8f9;text-decoration:none;">Help</a>
+                </p>
+                <p style="margin-top:0.75rem;color:#808080;font-size:0.78rem;line-height:1.5;">
+                    Passwords are protected with a salted, slow hash. Never reuse your email password here.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create particles
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const randomX = Math.random() * window.innerWidth;
+                const randomY = Math.random() * window.innerHeight;
+                const randomDelay = Math.random() * 4;
+                const randomDuration = 8 + Math.random() * 6;
+                const randomTx = (Math.random() - 0.5) * 300;
+
+                particle.style.left = randomX + 'px';
+                particle.style.top = randomY + 'px';
+                particle.style.animation = `particleFloat ${randomDuration}s ease-in-out ${randomDelay}s infinite`;
+                particle.style.setProperty('--tx', randomTx + 'px');
+
+                container.appendChild(particle);
+            }
+        }
+
+        let registrationMode = new URLSearchParams(window.location.search).get('mode') === 'register';
+
+        function initializeThemeToggle() {
+            const root = document.documentElement;
+            const button = document.querySelector('[data-theme-toggle]');
+            const savedTheme = localStorage.getItem('nexusTheme');
+            root.dataset.theme = savedTheme === 'light' ? 'light' : 'dark';
+            const updateButton = () => {
+                const light = root.dataset.theme === 'light';
+                button.textContent = light ? '🌙 Dark mode' : '☀️ Light mode';
+                button.setAttribute('aria-label', `Switch to ${light ? 'dark' : 'light'} mode`);
+            };
+            button.addEventListener('click', () => {
+                root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('nexusTheme', root.dataset.theme);
+                updateButton();
+            });
+            updateButton();
+        }
+
+        function updateAuthMode() {
+            const name = document.getElementById('name');
+            const nameGroup = document.getElementById('nameGroup');
+            const password = document.getElementById('password');
+            const prompt = document.getElementById('modePrompt');
+            const toggle = document.getElementById('modeToggle');
+            nameGroup.hidden = !registrationMode;
+            name.required = registrationMode;
+            password.autocomplete = registrationMode ? 'new-password' : 'current-password';
+            document.querySelector('.login-title').textContent = registrationMode ? 'Create your account' : 'Welcome to NEXUS';
+            document.querySelector('.login-subtitle').textContent = registrationMode
+                ? 'Create a secure account for your private workspace'
+                : 'Sign in to your private workspace';
+            document.querySelector('#submitButton .button-text').textContent = registrationMode ? 'Create account' : 'Sign in';
+            prompt.firstChild.textContent = registrationMode ? 'Already have an account? ' : 'New to NEXUS? ';
+            toggle.textContent = registrationMode ? 'Sign in' : 'Create an account';
+        }
+
+        initializeThemeToggle();
+        document.getElementById('accountForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const error = document.getElementById('errorMessage');
+            const success = document.getElementById('successMessage');
+            const button = document.getElementById('submitButton');
+            error.classList.remove('show');
+            success.classList.remove('show');
+            button.disabled = true;
+            button.classList.add('loading');
+            button.querySelector('.button-text').textContent = registrationMode ? 'Creating account…' : 'Signing in…';
+            const payload = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value
+            };
+            try {
+                const response = await fetch(registrationMode ? '/api/auth/register' : '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not sign in.');
+                success.textContent = registrationMode ? 'Account created. Opening your workspace…' : 'Signed in. Opening your workspace…';
+                success.classList.add('show');
+                window.location.replace('/app');
+            } catch (requestError) {
+                error.textContent = requestError.message || 'Could not reach NEXUS. Make sure the server is running.';
+                error.classList.add('show');
+            } finally {
+                button.disabled = false;
+                button.classList.remove('loading');
+                button.querySelector('.button-text').textContent = registrationMode ? 'Create account' : 'Sign in';
+            }
+        });
+
+        document.getElementById('modeToggle').addEventListener('click', () => {
+            registrationMode = !registrationMode;
+            updateAuthMode();
+        });
+        updateAuthMode();
+
+        window.addEventListener('load', async () => {
+            createParticles();
+            try {
+                const response = await fetch('/api/health');
+                if (!response.ok) throw new Error('NEXUS server health check failed.');
+                const health = await response.json();
+                if (health.authenticated) {
+                    window.location.replace('/app');
+                    return;
+                }
+                if (health.signInConfigured) {
+                    const googleButton = document.getElementById('googleSignInButton');
+                    googleButton.hidden = false;
+                    googleButton.addEventListener('click', () => window.location.assign('/auth/login/google'));
+                }
+            } catch {
+                const message = document.getElementById('errorMessage');
+                message.textContent = 'Could not reach NEXUS. Start the server with npm start and open http://localhost:3000.';
+                message.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
+ 

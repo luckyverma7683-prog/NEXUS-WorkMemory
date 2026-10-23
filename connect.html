@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXUS - Connect Source</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0d17 0%, #101827 50%, #0f172a 100%);
+            color: #edf6ff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .panel {
+            width: min(760px, 100%);
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+        .topbar {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.9);
+        }
+        .brand {
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #67e8f9, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .back-btn {
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            background: transparent;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            cursor: pointer;
+        }
+        .content {
+            padding: 2rem 1.5rem 1.5rem;
+        }
+        .heading {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(59,130,246,0.25));
+            border: 1px solid rgba(103,232,249,0.45);
+            font-size: 1.8rem;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2vw, 2.1rem);
+        }
+        .subtitle {
+            color: #bcd0e7;
+            margin-top: 0.4rem;
+        }
+        .permission-box {
+            background: rgba(15, 118, 110, 0.09);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            margin: 1.5rem 0;
+        }
+        .setup-guide {
+            margin: 1.25rem 0;
+            padding: 1rem 1.1rem;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            border-radius: 14px;
+            background: rgba(146, 64, 14, 0.16);
+            color: #fde68a;
+            line-height: 1.6;
+        }
+        .setup-guide[hidden] {
+            display: none;
+        }
+        .setup-guide a {
+            color: #67e8f9;
+        }
+        .section-title {
+            font-weight: 700;
+            margin-bottom: 0.7rem;
+            color: #dbeafe;
+        }
+        .permission-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 0.7rem;
+        }
+        .permission-list li {
+            border: 1px solid rgba(148,163,184,0.2);
+            background: rgba(148,163,184,0.04);
+            border-radius: 10px;
+            padding: 0.8rem 0.9rem;
+            color: #dbeafe;
+        }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn.secondary {
+            background: rgba(148,163,184,0.15);
+            color: #e2e8f0;
+        }
+        .btn.primary {
+            background: linear-gradient(135deg, #22d3ee, #3b82f6);
+            color: #08111d;
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+        .status {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            display: none;
+        }
+        .status.success {
+            display: block;
+            background: rgba(34,197,94,0.12);
+            color: #a7f3d0;
+            border: 1px solid rgba(74,222,128,0.35);
+        }
+        .status.error {
+            display: block;
+            background: rgba(239,68,68,0.12);
+            color: #fecaca;
+            border: 1px solid rgba(248,113,113,0.35);
+        }
+        .file-picker {
+            display: none;
+            margin-top: 1.25rem;
+        }
+        .file-picker.visible {
+            display: block;
+        }
+        .file-picker input {
+            max-width: 100%;
+            color: #dbeafe;
+        }
+        .source-items {
+            margin-top: 1.5rem;
+        }
+        .source-items[hidden] {
+            display: none;
+        }
+        .source-items-list {
+            max-height: 360px;
+            overflow: auto;
+        }
+        .source-items-list li {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .source-items-list a {
+            color: #67e8f9;
+            overflow-wrap: anywhere;
+        }
+        .source-item-detail {
+            color: #bcd0e7;
+            font-size: 0.85rem;
+        }
+
+        :root {
+            color-scheme: dark;
+            --page: #0b1220;
+            --surface: #111c2e;
+            --surface-raised: #17243a;
+            --border: #293a51;
+            --text: #edf3fa;
+            --muted: #9aa9bd;
+            --accent: #65b9c4;
+        }
+
+        body {
+            background: var(--page);
+            color: var(--text);
+        }
+
+        .panel {
+            border-color: var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+        }
+
+        .topbar {
+            border-color: var(--border);
+            background: #0e1829;
+        }
+
+        .brand {
+            color: var(--text);
+            background: none;
+            -webkit-text-fill-color: currentColor;
+            letter-spacing: 0.14em;
+        }
+
+        .back-btn,
+        .btn.secondary {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface-raised);
+            color: #d6e0ec;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .back-btn:hover,
+        .btn.secondary:hover {
+            border-color: #45677a;
+            background: #1b2b41;
+        }
+
+        .icon {
+            border-color: #344b62;
+            background: var(--surface-raised);
+        }
+
+        h1,
+        .section-title {
+            color: var(--text);
+        }
+
+        .subtitle,
+        .source-item-detail {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .permission-box {
+            border-color: #344b62;
+            border-radius: 12px;
+            background: var(--surface-raised);
+        }
+
+        .setup-guide {
+            border-radius: 12px;
+        }
+
+        .setup-guide a,
+        .source-items-list a {
+            color: #9bd5dc;
+        }
+
+        .permission-list li {
+            border-color: var(--border);
+            border-radius: 9px;
+            background: #0e1829;
+            color: #d9e3ef;
+            line-height: 1.5;
+        }
+
+        .btn.primary {
+            border-radius: 9px;
+            background: var(--accent);
+            color: #08161c;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            background: #83cbd3;
+            transform: translateY(-1px);
+        }
+
+        .status {
+            border-radius: 9px;
+            line-height: 1.5;
+        }
+
+        .file-picker input {
+            color: var(--muted);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                align-items: flex-start;
+                padding: 12px;
+            }
+
+            .panel {
+                border-radius: 14px;
+            }
+
+            .topbar {
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+
+            .content {
+                padding: 1.25rem 1rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .theme-toggle {
+            padding: 0.55rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface-raised);
+            color: var(--text);
+            font: inherit;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+
+        [data-theme="light"] body {
+            background: #f3f6fa;
+            color: #172438;
+        }
+
+        [data-theme="light"] .panel {
+            border-color: #dce4ed;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(31, 53, 79, 0.12);
+        }
+
+        [data-theme="light"] .topbar {
+            border-color: #dce4ed;
+            background: #f8fafc;
+        }
+
+        [data-theme="light"] .brand,
+        [data-theme="light"] h1,
+        [data-theme="light"] .section-title {
+            color: #172438;
+        }
+
+        [data-theme="light"] .subtitle,
+        [data-theme="light"] .source-item-detail {
+            color: #627287;
+        }
+
+        [data-theme="light"] .icon,
+        [data-theme="light"] .permission-list li {
+            border-color: #dce4ed;
+            background: #f7f9fc;
+            color: #34465d;
+        }
+
+        [data-theme="light"] .permission-box {
+            border-color: #cddfe2;
+            background: #f0f7f8;
+        }
+
+        [data-theme="light"] .setup-guide {
+            border-color: #ecd9a7;
+            background: #fff9e8;
+            color: #725414;
+        }
+
+        [data-theme="light"] .setup-guide a,
+        [data-theme="light"] .source-items-list a {
+            color: #287785;
+        }
+
+        [data-theme="light"] .back-btn,
+        [data-theme="light"] .btn.secondary {
+            border-color: #d3dce7;
+            background: #f7f9fc;
+            color: #34465d;
+        }
+
+        [data-theme="light"] .back-btn:hover,
+        [data-theme="light"] .btn.secondary:hover {
+            border-color: #b9d6da;
+            background: #eef6f7;
+        }
+
+        [data-theme="light"] .btn.primary {
+            background: #71bdc6;
+            color: #102b30;
+        }
+
+        [data-theme="light"] .btn.primary:hover:not(:disabled) {
+            background: #8acbd2;
+        }
+
+        [data-theme="light"] .status.success {
+            border-color: #c6e8d2;
+            background: #edf8f1;
+            color: #21774b;
+        }
+
+        [data-theme="light"] .status.error {
+            border-color: #f0cdca;
+            background: #fff1f0;
+            color: #a33333;
+        }
+
+        [data-theme="light"] .theme-toggle {
+            border-color: #d2dce7;
+            background: #fff;
+            color: #26384e;
+        }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <div class="topbar">
+            <div class="brand">NEXUS</div>
+            <div style="display:flex;gap:0.65rem;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">☀️ Light mode</button>
+                <button class="back-btn" onclick="goBack()">← Back to dashboard</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="heading">
+                <div class="icon" id="sourceIcon">🔗</div>
+                <div>
+                    <h1 id="sourceTitle">Connect source</h1>
+                    <div class="subtitle">Grant access only to the data you want NEXUS to understand.</div>
+                </div>
+            </div>
+
+            <div class="permission-box">
+                <div class="section-title">Requested permissions</div>
+                <ul class="permission-list" id="permissionList"></ul>
+            </div>
+
+            <div class="setup-guide" id="githubSetupGuide" hidden>
+                <strong>GitHub App setup is required before connecting.</strong>
+                <p id="githubSetupMessage"></p>
+                <ol>
+                    <li>Create a GitHub App and set both its callback and setup URLs to <code id="githubCallbackUrl"></code>.</li>
+                    <li>Grant read-only access to Contents, Issues, and Pull requests. Do not enable write permissions.</li>
+                    <li>Add the App ID, App URL slug, and downloaded private key to the matching <code>.env</code> entries, then restart NEXUS.</li>
+                </ol>
+                <a href="https://github.com/settings/apps" target="_blank" rel="noopener noreferrer">Open GitHub App settings</a>
+                <p>Keep the private key on your computer/server. Never paste it into chat or the browser.</p>
+            </div>
+
+            <div class="section-title" id="connectionDetailTitle">This connection allows NEXUS to:</div>
+            <ul class="permission-list">
+                <li>Keep access scoped to the account that signed in to NEXUS</li>
+                <li>Store provider credentials encrypted on the NEXUS server</li>
+                <li>Disconnect access from NEXUS at any time</li>
+            </ul>
+
+            <div class="file-picker" id="filePicker">
+                <p class="subtitle">Choose text, Markdown, CSV, or JSON files. Only files you select are uploaded; each file must be 1 MB or smaller.</p>
+                <input id="documentFiles" type="file" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json" multiple>
+                <button class="btn primary" id="uploadButton" type="button">Upload selected files</button>
+            </div>
+
+            <div class="source-items" id="sourceItems" hidden>
+                <div class="section-title">Available in this account</div>
+                <ul class="permission-list source-items-list" id="sourceItemsList"></ul>
+            </div>
+
+            <div class="actions">
+                <button class="btn secondary" id="cancelButton" type="button">Back</button>
+                <button class="btn secondary" id="disconnectButton" type="button" hidden>Disconnect</button>
+                <button class="btn primary" id="connectButton" type="button">Continue to provider</button>
+            </div>
+
+            <div class="status" id="statusBox"></div>
+        </div>
+    </div>
+
+    <script>
+        const sourceMap = {
+            'GitHub': {
+                id: 'github',
+                icon: '🐙',
+                permissions: ['Install the NEXUS GitHub App on repositories you choose', 'Read repository contents, issues, and pull requests', 'The GitHub App should be configured with read-only permissions']
+            },
+            'Google Drive': {
+                id: 'google-drive',
+                icon: '📁',
+                permissions: ['Read files in your Google Drive', 'View file names and metadata', 'NEXUS does not request permission to edit or delete files']
+            },
+            Documents: {
+                id: 'documents',
+                icon: '📄',
+                permissions: ['Upload only the files you choose', 'Supported: text, Markdown, CSV, and JSON', 'Uploaded file content is encrypted in NEXUS storage']
+            },
+            Notion: {
+                id: 'notion',
+                icon: '📝',
+                permissions: ['Read pages explicitly shared with the NEXUS integration', 'NEXUS does not request permission to edit pages']
+            },
+            Slack: {
+                id: 'slack',
+                icon: '💬',
+                permissions: ['Read public channels and channels the NEXUS app is invited to', 'Read messages in channels the app can access', 'Invite the NEXUS app to private channels you want to include']
+            }
+        };
+
+        function getSourceFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('source') || 'GitHub';
+        }
+
+        async function renderSource() {
+            const sessionResponse = await fetch('/api/auth/me');
+            if (sessionResponse.status === 401) {
+                window.location.replace('home.html');
+                return;
+            }
+            if (!sessionResponse.ok) {
+                showStatus('Could not verify your NEXUS account. Refresh and try again.', 'error');
+                return;
+            }
+            const sourceName = getSourceFromQuery();
+            const config = sourceMap[sourceName];
+            if (!config) {
+                window.location.replace('dashboard.html');
+                return;
+            }
+            document.getElementById('sourceTitle').textContent = `Connect ${sourceName}`;
+            document.getElementById('sourceIcon').textContent = config.icon;
+            const list = document.getElementById('permissionList');
+            list.replaceChildren(...config.permissions.map(item => {
+                const entry = document.createElement('li');
+                entry.textContent = item;
+                return entry;
+            }));
+
+            document.getElementById('cancelButton').addEventListener('click', goBack);
+            document.getElementById('connectButton').addEventListener('click', () => connectSource(config));
+            document.getElementById('disconnectButton').addEventListener('click', () => disconnectSource(config));
+            document.getElementById('uploadButton').addEventListener('click', uploadDocuments);
+            if (config.id === 'documents') {
+                document.getElementById('connectButton').hidden = true;
+                document.getElementById('filePicker').classList.add('visible');
+                document.getElementById('connectionDetailTitle').textContent = 'Choose what to upload:';
+                document.querySelector('.permission-box .section-title').textContent = 'Local file handling';
+                await loadDocuments();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/sources');
+                if (response.status === 401) {
+                    window.location.replace('home.html');
+                    return;
+                }
+                if (!response.ok) throw new Error('Could not load connection status.');
+                const result = await response.json();
+                if (config.id === 'github' && !result.providers?.github?.configured) {
+                    document.getElementById('githubSetupGuide').hidden = false;
+                    document.getElementById('githubSetupMessage').textContent = result.providers?.github?.message
+                        || 'Configure the GitHub App credentials in the server .env file.';
+                    document.getElementById('githubCallbackUrl').textContent = `${window.location.origin}/auth/callback/github`;
+                    document.getElementById('connectButton').disabled = true;
+                    document.getElementById('connectButton').textContent = 'Complete GitHub setup first';
+                }
+                const connected = result.sources?.[config.id]?.connected;
+                if (connected) {
+                    document.getElementById('connectButton').hidden = true;
+                    document.getElementById('disconnectButton').hidden = false;
+                    document.getElementById('sourceTitle').textContent = `Manage ${sourceName}`;
+                    document.getElementById('statusBox').textContent = `${sourceName} is connected to this account.`;
+                    document.getElementById('statusBox').className = 'status success';
+                    await loadSourceItems(config);
+                }
+            } catch {
+                showStatus('Could not load connection status. Check your connection and retry.', 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById('statusBox');
+            box.textContent = message;
+            box.className = 'status ' + type;
+        }
+
+        function connectSource(config) {
+            window.location.assign(`/auth/connect/${config.id === 'google-drive' ? 'google' : config.id}`);
+        }
+
+        async function loadSourceItems(config) {
+            const container = document.getElementById('sourceItems');
+            const list = document.getElementById('sourceItemsList');
+            container.hidden = false;
+            list.replaceChildren();
+            const loading = document.createElement('li');
+            loading.textContent = 'Loading provider data...';
+            list.appendChild(loading);
+            try {
+                const response = await fetch(`/api/sources/${config.id}/items`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not load provider data.');
+                list.replaceChildren();
+                if (!result.items.length) {
+                    const empty = document.createElement('li');
+                    empty.textContent = 'No items are currently available to this integration.';
+                    list.appendChild(empty);
+                    return;
+                }
+                result.items.forEach(item => {
+                    const entry = document.createElement('li');
+                    const label = document.createElement(item.url ? 'a' : 'span');
+                    label.textContent = item.name;
+                    if (item.url) {
+                        label.href = item.url;
+                        label.target = '_blank';
+                        label.rel = 'noopener noreferrer';
+                    }
+                    entry.appendChild(label);
+                    if (item.detail) {
+                        const detail = document.createElement('span');
+                        detail.className = 'source-item-detail';
+                        detail.textContent = item.detail;
+                        entry.appendChild(detail);
+                    }
+                    list.appendChild(entry);
+                });
+            } catch (error) {
+                showStatus(error.message, 'error');
+                list.replaceChildren();
+            }
+        }
+
+        async function loadDocuments() {
+            const container = document.getElementById('sourceItems');
+            const list = document.getElementById('sourceItemsList');
+            container.hidden = false;
+            list.replaceChildren();
+            try {
+                const response = await fetch('/api/documents');
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not load uploaded files.');
+                if (!result.documents.length) {
+                    const empty = document.createElement('li');
+                    empty.textContent = 'No uploaded files yet.';
+                    list.appendChild(empty);
+                    return;
+                }
+                result.documents.forEach(documentInfo => {
+                    const entry = document.createElement('li');
+                    const name = document.createElement('span');
+                    name.textContent = documentInfo.name;
+                    const remove = document.createElement('button');
+                    remove.className = 'btn secondary';
+                    remove.type = 'button';
+                    remove.textContent = 'Delete';
+                    remove.addEventListener('click', async () => {
+                        const result = await fetch(`/api/documents/${encodeURIComponent(documentInfo.id)}`, { method: 'DELETE' });
+                        const data = await result.json();
+                        if (!result.ok) {
+                            showStatus(data.error || 'Could not delete this file.', 'error');
+                            return;
+                        }
+                        await loadDocuments();
+                    });
+                    entry.append(name, remove);
+                    list.appendChild(entry);
+                });
+            } catch (error) {
+                showStatus(error.message, 'error');
+            }
+        }
+
+        async function disconnectSource(config) {
+            if (!confirm(`Disconnect ${getSourceFromQuery()} from NEXUS?`)) return;
+            const response = await fetch(`/api/sources/${config.id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (!response.ok) {
+                showStatus(result.error || 'Could not disconnect this source.', 'error');
+                return;
+            }
+            showStatus('NEXUS deleted its stored credentials. You may also revoke the app from the provider account settings.', 'success');
+            document.getElementById('connectButton').hidden = false;
+            document.getElementById('disconnectButton').hidden = true;
+        }
+
+        async function uploadDocuments() {
+            const input = document.getElementById('documentFiles');
+            if (!input.files.length) {
+                showStatus('Choose one or more supported files first.', 'error');
+                return;
+            }
+            const button = document.getElementById('uploadButton');
+            button.disabled = true;
+            try {
+                for (const file of input.files) {
+                    if (file.size > 1024 * 1024) throw new Error(`${file.name} is larger than 1 MB.`);
+                    const content = await file.text();
+                    const response = await fetch('/api/documents', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: file.name, content })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || `Could not upload ${file.name}.`);
+                }
+                await loadDocuments();
+                showStatus('Files uploaded and encrypted. You can now ask NEXUS questions about their contents.', 'success');
+                input.value = '';
+            } catch (error) {
+                showStatus(error.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        function initializeThemeToggle() {
+            const root = document.documentElement;
+            const button = document.querySelector('[data-theme-toggle]');
+            const savedTheme = localStorage.getItem('nexusTheme');
+            root.dataset.theme = savedTheme === 'light' ? 'light' : 'dark';
+            const updateButton = () => {
+                const light = root.dataset.theme === 'light';
+                button.textContent = light ? '🌙 Dark mode' : '☀️ Light mode';
+                button.setAttribute('aria-label', `Switch to ${light ? 'dark' : 'light'} mode`);
+            };
+            button.addEventListener('click', () => {
+                root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('nexusTheme', root.dataset.theme);
+                updateButton();
+            });
+            updateButton();
+        }
+
+        initializeThemeToggle();
+        window.addEventListener('load', renderSource);
+    </script>
+</body>
+</html>

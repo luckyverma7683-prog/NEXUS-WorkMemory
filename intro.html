@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - AI Work Memory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== SPLASH SCREEN ===== */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        /* ===== PARTICLES ===== */
+        .particles-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 212, 255, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            animation: particleFloat 8s ease-in infinite;
+        }
+
+        /* ===== LOADING BAR ===== */
+        .splash-loading {
+            margin-top: 3rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.6s forwards;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .loading-bar-container {
+            width: 250px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            border-radius: 10px;
+            animation: loadingBarFill 1.4s ease-in-out forwards;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+        }
+
+        .loading-text {
+            font-size: 0.85rem;
+            color: #00d4ff;
+            letter-spacing: 3px;
+            font-weight: 600;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+
+        .loading-percentage {
+            font-size: 0.75rem;
+            color: #808080;
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .intro-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.75rem;
+        }
+
+        .intro-continue {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.6);
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: #0f0f1e;
+            font: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .intro-continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+        }
+
+        .intro-status {
+            min-height: 1.4rem;
+            margin-top: 1rem;
+            color: #b0b0b0;
+            font-size: 0.85rem;
+        }
+
+        .splash-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .splash-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        /* ===== ANIMATED LOGO ===== */
+        .splash-logo {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            margin-bottom: 2rem;
+            animation: logoScale 1s ease-out;
+        }
+
+        .splash-logo-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: iconRotate 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* ===== TAGLINE TYPING ANIMATION ===== */
+        .splash-tagline {
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            color: #00d4ff;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            min-height: 30px;
+        }
+
+        .tagline-word {
+            display: inline-block;
+            opacity: 0;
+            animation: wordFadeIn 0.6s ease-out forwards;
+            margin: 0 0.5rem;
+        }
+
+        .tagline-word:nth-child(1) { animation-delay: 0.3s; }
+        .tagline-word:nth-child(2) { animation-delay: 0.9s; }
+        .tagline-word:nth-child(3) { animation-delay: 1.5s; }
+
+        /* ===== TAGLINE LINE ===== */
+        .splash-description {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 500px;
+            line-height: 1.8;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+        }
+
+
+
+        /* ===== ANIMATED BACKGROUND ELEMENTS ===== */
+        .floating-element {
+            position: absolute;
+            opacity: 0.05;
+            font-size: 10rem;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 10%;
+            left: 10%;
+            animation-delay: 4s;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes logoScale {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes iconRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(180deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes wordFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(-40px) translateX(0px);
+            }
+            75% {
+                transform: translateY(-20px) translateX(-10px);
+            }
+        }
+
+        @keyframes loadingBarFill {
+            from {
+                width: 0%;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0px) translateX(0px) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(var(--tx)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes blink {
+            0%, 49%, 100% {
+                opacity: 1;
+            }
+            50%, 99% {
+                opacity: 0.3;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .splash-logo {
+                font-size: 3rem;
+                letter-spacing: 2px;
+            }
+
+            .splash-logo-icon {
+                font-size: 2.5rem;
+            }
+
+            .splash-tagline {
+                font-size: 0.95rem;
+                letter-spacing: 2px;
+            }
+
+            .splash-description {
+                font-size: 1rem;
+                max-width: 90%;
+            }
+
+            .skip-button {
+                top: 1.5rem;
+                right: 1.5rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .floating-element {
+                font-size: 6rem;
+            }
+        }
+
+        :root {
+            color-scheme: dark;
+            --surface: #111c2e;
+            --text: #edf3fa;
+            --muted: #9aa9bd;
+            --accent: #65b9c4;
+        }
+
+        body,
+        .splash-screen {
+            background: #0b1220;
+            color: var(--text);
+        }
+
+        .splash-screen::before {
+            background: radial-gradient(ellipse at 50% 36%, rgba(55, 111, 133, 0.2), transparent 58%);
+        }
+
+        .particles-container,
+        .floating-element,
+        .splash-logo-icon {
+            display: none;
+        }
+
+        .splash-content {
+            width: min(620px, calc(100% - 40px));
+            padding: clamp(2rem, 6vw, 4rem);
+            border: 1px solid #26364b;
+            border-radius: 24px;
+            background: rgba(17, 28, 46, 0.92);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+        }
+
+        .splash-logo {
+            margin-bottom: 1.25rem;
+            color: #e9f3fb;
+            background: none;
+            -webkit-text-fill-color: currentColor;
+            letter-spacing: 0.12em;
+        }
+
+        .splash-tagline {
+            color: var(--accent);
+            font-size: 0.88rem;
+            letter-spacing: 0.16em;
+        }
+
+        .tagline-word {
+            margin: 0 0.3rem;
+        }
+
+        .splash-description {
+            color: var(--muted);
+            font-size: 1.05rem;
+        }
+
+        .splash-loading {
+            margin-top: 2rem;
+        }
+
+        .loading-bar-container {
+            background: #26364b;
+            box-shadow: none;
+        }
+
+        .loading-bar-fill,
+        .intro-continue {
+            background: var(--accent);
+            box-shadow: none;
+        }
+
+        .loading-text {
+            color: #b3c2d4;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            animation: none;
+        }
+
+        .intro-continue {
+            min-height: 46px;
+            padding: 0.75rem 1.35rem;
+            border: 1px solid var(--accent);
+            border-radius: 9px;
+            color: #08161c;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .intro-continue:hover {
+            background: #83cbd3;
+            box-shadow: none;
+            transform: translateY(-1px);
+        }
+
+        .intro-status {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .splash-content {
+                padding: 2rem 1.25rem;
+                border-radius: 18px;
+            }
+
+            .splash-tagline {
+                letter-spacing: 0.08em;
+            }
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 2001;
+            padding: 0.6rem 0.9rem;
+            border: 1px solid #34465d;
+            border-radius: 9px;
+            background: #111c2e;
+            color: #dce6f1;
+            font: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        [data-theme="light"] body,
+        [data-theme="light"] .splash-screen {
+            background: #f3f6fa;
+            color: #172438;
+        }
+
+        [data-theme="light"] .splash-screen::before {
+            background: radial-gradient(ellipse at 50% 36%, rgba(91, 160, 173, 0.13), transparent 58%);
+        }
+
+        [data-theme="light"] .splash-content {
+            border-color: #dce4ed;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 24px 70px rgba(31, 53, 79, 0.12);
+        }
+
+        [data-theme="light"] .splash-logo {
+            color: #172438;
+            -webkit-text-fill-color: currentColor;
+        }
+
+        [data-theme="light"] .splash-tagline,
+        [data-theme="light"] .intro-continue,
+        [data-theme="light"] .loading-bar-fill {
+            color: #14515b;
+        }
+
+        [data-theme="light"] .loading-text,
+        [data-theme="light"] .intro-status,
+        [data-theme="light"] .splash-description {
+            color: #586b80;
+        }
+
+        [data-theme="light"] .loading-bar-container {
+            background: #e1e8ef;
+        }
+
+        [data-theme="light"] .theme-toggle {
+            border-color: #d2dce7;
+            background: #fff;
+            color: #26384e;
+        }
+
+        [data-theme="light"] .intro-continue {
+            background: #71bdc6;
+            border-color: #71bdc6;
+        }
+
+        [data-theme="light"] .intro-continue:hover {
+            background: #8acbd2;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">☀️ Light mode</button>
+    <!-- SPLASH SCREEN -->
+    <section class="splash-screen" id="splashScreen">
+        <!-- Particle Effects -->
+        <div class="particles-container" id="particlesContainer"></div>
+
+        <!-- Floating Background Elements -->
+        <div class="floating-element">📦</div>
+        <div class="floating-element">💻</div>
+        <div class="floating-element">📝</div>
+
+        <!-- Main Content -->
+        <div class="splash-content">
+            <!-- Animated Icon -->
+            <div class="splash-logo-icon">⚡</div>
+
+            <!-- Animated Logo -->
+            <div class="splash-logo">NEXUS</div>
+
+            <!-- Animated Tagline -->
+            <div class="splash-tagline">
+                <span class="tagline-word">Connect</span>
+                <span class="tagline-word">Remember</span>
+                <span class="tagline-word">Understand</span>
+            </div>
+
+            <!-- Description -->
+            <div class="splash-description">
+                AI-Powered Work Memory System
+            </div>
+
+            <!-- Loading Bar -->
+            <div class="splash-loading">
+                <div class="loading-bar-container">
+                    <div class="loading-bar-fill"></div>
+                </div>
+                <div class="loading-text">YOUR WORKSPACE, CONNECTED</div>
+                <div class="intro-actions">
+                    <a class="intro-continue" id="introContinue" href="/login">Continue to NEXUS</a>
+                </div>
+                <div class="intro-status" id="introStatus" role="status" aria-live="polite"></div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Create animated particles
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const randomX = Math.random() * window.innerWidth;
+                const randomY = Math.random() * window.innerHeight;
+                const randomDelay = Math.random() * 4;
+                const randomDuration = 6 + Math.random() * 4;
+                const randomTx = (Math.random() - 0.5) * 200;
+
+                particle.style.left = randomX + 'px';
+                particle.style.top = randomY + 'px';
+                particle.style.animation = `particleFloat ${randomDuration}s ease-in-out ${randomDelay}s infinite`;
+                particle.style.setProperty('--tx', randomTx + 'px');
+
+                container.appendChild(particle);
+            }
+        }
+
+        async function initializeIntro() {
+            createParticles();
+            const status = document.getElementById('introStatus');
+            const continueLink = document.getElementById('introContinue');
+            try {
+                const healthResponse = await fetch('/api/health');
+                if (!healthResponse.ok) throw new Error('NEXUS server did not respond.');
+                const health = await healthResponse.json();
+                if (health.authenticated) {
+                    continueLink.href = '/app';
+                    continueLink.textContent = 'Open your workspace';
+                    status.textContent = 'Your NEXUS workspace is ready.';
+                } else {
+                    status.textContent = 'Create an account or sign in with your email. Google sign-in is optional.';
+                }
+            } catch {
+                continueLink.removeAttribute('href');
+                continueLink.setAttribute('aria-disabled', 'true');
+                continueLink.style.opacity = '0.55';
+                status.textContent = 'Start the NEXUS server with npm start, then reload this page.';
+            }
+        }
+
+        function initializeThemeToggle() {
+            const root = document.documentElement;
+            const button = document.querySelector('[data-theme-toggle]');
+            const savedTheme = localStorage.getItem('nexusTheme');
+            root.dataset.theme = savedTheme === 'light' ? 'light' : 'dark';
+            const updateButton = () => {
+                const light = root.dataset.theme === 'light';
+                button.textContent = light ? '🌙 Dark mode' : '☀️ Light mode';
+                button.setAttribute('aria-label', `Switch to ${light ? 'dark' : 'light'} mode`);
+            };
+            button.addEventListener('click', () => {
+                root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('nexusTheme', root.dataset.theme);
+                updateButton();
+            });
+            updateButton();
+        }
+
+        initializeThemeToggle();
+        window.addEventListener('load', initializeIntro);
+    </script>
+</body>
+</html>
