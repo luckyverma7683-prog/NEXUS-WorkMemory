@@ -4,49 +4,406 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NEXUS - Connect Source</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="nexus-theme.js"></script>
     <style>
         * { box-sizing: border-box; }
+
+        :root,
+        [data-theme="cyber-nexus"] {
+            color-scheme: dark;
+            --bg-page: #070d17;
+            --bg-surface: #0e1726;
+            --bg-surface-raised: #142238;
+            --border: #22344d;
+            --border-hover: #3b5377;
+            --text-primary: #edf4fc;
+            --text-muted: #8fa2bd;
+            --accent: #00d4ff;
+            --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #0077ff 100%);
+            --accent-glow: rgba(0, 212, 255, 0.28);
+            --cyan: #00d4ff;
+        }
+
+        [data-theme="midnight-oled"] {
+            color-scheme: dark;
+            --bg-page: #000000;
+            --bg-surface: #09090d;
+            --bg-surface-raised: #12121c;
+            --border: #232334;
+            --border-hover: #3e3e56;
+            --text-primary: #f3f3fc;
+            --text-muted: #8a8a9e;
+            --accent: #a855f7;
+            --accent-gradient: linear-gradient(135deg, #c084fc 0%, #7e22ce 100%);
+            --accent-glow: rgba(168, 85, 247, 0.28);
+            --cyan: #c084fc;
+        }
+
+        [data-theme="matrix-emerald"] {
+            color-scheme: dark;
+            --bg-page: #020b06;
+            --bg-surface: #05180e;
+            --bg-surface-raised: #0b2517;
+            --border: #133a24;
+            --border-hover: #21603c;
+            --text-primary: #e6fcf0;
+            --text-muted: #7ca88f;
+            --accent: #10b981;
+            --accent-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --accent-glow: rgba(16, 185, 129, 0.28);
+            --cyan: #34d399;
+        }
+
+        [data-theme="solar-slate"],
+        [data-theme="light"] {
+            color-scheme: light;
+            --bg-page: #f1f5f9;
+            --bg-surface: #ffffff;
+            --bg-surface-raised: #f8fafc;
+            --border: #cbd5e1;
+            --border-hover: #94a3b8;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --accent: #0284c7;
+            --accent-gradient: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            --accent-glow: rgba(2, 132, 199, 0.2);
+            --cyan: #0284c7;
+        }
+
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0a0d17 0%, #101827 50%, #0f172a 100%);
-            color: #edf6ff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
+            transition: background 0.3s ease, color 0.3s ease;
         }
+
         .panel {
             width: min(760px, 100%);
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(59, 130, 246, 0.35);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
             border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.35);
             overflow: hidden;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
+
         .topbar {
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 23, 42, 0.9);
+            background: var(--bg-surface-raised);
         }
-        .brand {
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, #67e8f9, #60a5fa);
+
+        /* ===== FLASHY MIRROR ANIMATED NEXUS LOGO ===== */
+        .nexus-brand-wrapper {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .nexus-logo-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            position: relative;
+        }
+
+        .nexus-flashy-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            line-height: 1;
+        }
+
+        .nexus-flashy-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: linear-gradient(
+                110deg,
+                var(--accent) 0%,
+                #ffffff 25%,
+                var(--accent) 50%,
+                #8ae8ff 75%,
+                var(--accent) 100%
+            );
+            background-size: 220% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: nexusFlashyShine 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+            display: inline-block;
+            position: relative;
+            z-index: 2;
         }
+
+        @keyframes nexusFlashyShine {
+            0% { background-position: 200% center; }
+            50% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+        }
+
+        .nexus-mirror-reflection {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.35) 0%,
+                rgba(0, 212, 255, 0.2) 30%,
+                transparent 80%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scaleY(-0.65) translateY(-6px);
+            filter: blur(0.7px);
+            opacity: 0.5;
+            pointer-events: none;
+            margin-top: -6px;
+            height: 14px;
+            overflow: hidden;
+            user-select: none;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 85%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 85%);
+            animation: nexusMirrorPulse 3.6s ease-in-out infinite;
+        }
+
+        @keyframes nexusMirrorPulse {
+            0%, 100% { opacity: 0.45; filter: blur(0.8px); }
+            50% { opacity: 0.75; filter: blur(0.3px); }
+        }
+
+        /* ===== CUTE LITTLE ANIMATED BOT MASCOT ===== */
+        .nexus-bot-mascot {
+            position: relative;
+            width: 32px;
+            height: 38px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            animation: botFloat 3.2s ease-in-out infinite;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+        }
+
+        .nexus-bot-mascot:hover {
+            transform: scale(1.18) rotate(5deg) translateY(-2px);
+        }
+
+        @keyframes botFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(-1.5deg); }
+        }
+
+        .bot-antenna {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            margin-bottom: -1px;
+        }
+
+        .antenna-orb {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: orbPulse 1.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes orbPulse {
+            0% { transform: scale(0.85); box-shadow: 0 0 5px var(--accent); }
+            100% { transform: scale(1.3); box-shadow: 0 0 12px var(--accent); }
+        }
+
+        .antenna-stem {
+            width: 1.5px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .bot-head {
+            width: 26px;
+            height: 20px;
+            background: linear-gradient(145deg, #1f2e46, #0d1726);
+            border: 1.5px solid var(--border-hover);
+            border-radius: 7px 7px 6px 6px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+        }
+
+        .bot-ear {
+            position: absolute;
+            width: 3px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 2px;
+            top: 4px;
+            box-shadow: 0 0 5px var(--accent);
+        }
+        .ear-left { left: -3.5px; }
+        .ear-right { right: -3.5px; }
+
+        .bot-visor {
+            width: 19px;
+            height: 12px;
+            background: #060a12;
+            border-radius: 3.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bot-eye {
+            width: 4px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 40%;
+            box-shadow: 0 0 6px var(--accent);
+            animation: botBlink 4s ease-in-out infinite;
+        }
+
+        @keyframes botBlink {
+            0%, 94%, 98%, 100% { transform: scaleY(1); }
+            96% { transform: scaleY(0.1); }
+        }
+
+        .nexus-bot-mascot:hover .bot-eye {
+            height: 2.5px;
+            border-radius: 2.5px 2.5px 0 0;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .bot-blush {
+            position: absolute;
+            width: 3px;
+            height: 1.5px;
+            background: #ff5e97;
+            border-radius: 50%;
+            bottom: 1px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .blush-left { left: 2px; }
+        .blush-right { right: 2px; }
+
+        .nexus-bot-mascot:hover .bot-blush {
+            opacity: 0.9;
+        }
+
+        .bot-body {
+            width: 14px;
+            height: 7px;
+            background: linear-gradient(145deg, #18253a, #0b1320);
+            border: 1.5px solid var(--border-hover);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-top: -1px;
+            z-index: 1;
+        }
+
+        .bot-core-gem {
+            width: 3.5px;
+            height: 3.5px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--accent);
+            animation: gemPulse 2s ease-in-out infinite;
+        }
+
+        .bot-hover-shadow {
+            width: 17px;
+            height: 3px;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.4) 0%, transparent 75%);
+            border-radius: 50%;
+            position: absolute;
+            bottom: -4px;
+            animation: botShadow 3.2s ease-in-out infinite;
+        }
+
+        .bot-speech-bubble {
+            position: absolute;
+            top: -26px;
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .bot-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-top: 3px solid var(--accent);
+        }
+
+        .nexus-bot-mascot:hover .bot-speech-bubble,
+        .nexus-bot-mascot.chatty .bot-speech-bubble {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .back-btn {
-            border: 1px solid rgba(148, 163, 184, 0.4);
-            background: transparent;
-            color: #e2e8f0;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-primary);
             border-radius: 10px;
             padding: 0.65rem 1rem;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .back-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .content {
             padding: 2rem 1.5rem 1.5rem;
@@ -442,7 +799,35 @@
 <body>
     <div class="panel">
         <div class="topbar">
-            <div class="brand">NEXUS</div>
+            <a href="dashboard.html" class="nexus-brand-wrapper">
+                <div class="nexus-logo-group">
+                    <div class="nexus-bot-mascot" id="nexusConnectBot" title="Hi, I'm NEXUS! Click me ✨">
+                        <div class="bot-antenna">
+                            <div class="antenna-orb"></div>
+                            <div class="antenna-stem"></div>
+                        </div>
+                        <div class="bot-head">
+                            <div class="bot-ear ear-left"></div>
+                            <div class="bot-ear ear-right"></div>
+                            <div class="bot-visor">
+                                <div class="bot-eye eye-left"></div>
+                                <div class="bot-eye eye-right"></div>
+                                <div class="bot-blush blush-left"></div>
+                                <div class="bot-blush blush-right"></div>
+                            </div>
+                        </div>
+                        <div class="bot-body">
+                            <div class="bot-core-gem"></div>
+                        </div>
+                        <div class="bot-hover-shadow"></div>
+                        <div class="bot-speech-bubble">Connect! ✨</div>
+                    </div>
+                    <div class="nexus-flashy-container">
+                        <span class="nexus-flashy-text">NEXUS</span>
+                        <span class="nexus-mirror-reflection" aria-hidden="true">NEXUS</span>
+                    </div>
+                </div>
+            </a>
             <div style="display:flex;gap:0.65rem;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
                 <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">☀️ Light mode</button>
                 <button class="back-btn" onclick="goBack()">← Back to dashboard</button>
@@ -483,8 +868,8 @@
             </ul>
 
             <div class="file-picker" id="filePicker">
-                <p class="subtitle">Choose text, Markdown, CSV, or JSON files. Only files you select are uploaded; each file must be 1 MB or smaller.</p>
-                <input id="documentFiles" type="file" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json" multiple>
+                <p class="subtitle">Choose text, Markdown, code, CSV, or JSON files (.txt, .md, .js, .ts, .py, .html, .css, .yaml, .sql, etc.). Only files you select are uploaded; each file must be 2 MB or smaller.</p>
+                <input id="documentFiles" type="file" accept=".txt,.md,.markdown,.csv,.json,.js,.jsx,.ts,.tsx,.py,.html,.css,.yaml,.yml,.sql,.sh,.env" multiple>
                 <button class="btn primary" id="uploadButton" type="button">Upload selected files</button>
             </div>
 
@@ -518,7 +903,7 @@
             Documents: {
                 id: 'documents',
                 icon: '📄',
-                permissions: ['Upload only the files you choose', 'Supported: text, Markdown, CSV, and JSON', 'Uploaded file content is encrypted in NEXUS storage']
+                permissions: ['Upload only the files you choose', 'Supported: Text, Code (.js, .ts, .py, .html, .css, .sql), Markdown, CSV, and JSON', 'Uploaded file content is encrypted with AES-256 in NEXUS storage']
             },
             Notion: {
                 id: 'notion',
@@ -565,7 +950,11 @@
             document.getElementById('cancelButton').addEventListener('click', goBack);
             document.getElementById('connectButton').addEventListener('click', () => connectSource(config));
             document.getElementById('disconnectButton').addEventListener('click', () => disconnectSource(config));
-            document.getElementById('uploadButton').addEventListener('click', uploadDocuments);
+            const urlErr = new URLSearchParams(window.location.search).get('error');
+            if (urlErr) {
+                showStatus(`⚠️ ${decodeURIComponent(urlErr)}`, 'error');
+            }
+
             if (config.id === 'documents') {
                 document.getElementById('connectButton').hidden = true;
                 document.getElementById('filePicker').classList.add('visible');
@@ -596,9 +985,17 @@
                     document.getElementById('connectButton').hidden = true;
                     document.getElementById('disconnectButton').hidden = false;
                     document.getElementById('sourceTitle').textContent = `Manage ${sourceName}`;
-                    document.getElementById('statusBox').textContent = `${sourceName} is connected to this account.`;
+                    const account = result.sources[config.id]?.account ? ` (@${result.sources[config.id].account})` : '';
+                    document.getElementById('statusBox').textContent = `${sourceName} is connected to this account${account}.`;
                     document.getElementById('statusBox').className = 'status success';
                     await loadSourceItems(config);
+                } else if (config.id === 'github' && result.providers?.github?.installations?.length) {
+                    const inst = result.providers.github.installations[0];
+                    if (!urlErr) {
+                        document.getElementById('statusBox').textContent = `Detected GitHub App installation on @${inst.account} (ID: ${inst.id}). Click below to verify and connect to your workspace.`;
+                        document.getElementById('statusBox').className = 'status';
+                    }
+                    document.getElementById('connectButton').textContent = `Connect @${inst.account}`;
                 }
             } catch {
                 showStatus('Could not load connection status. Check your connection and retry.', 'error');
@@ -611,7 +1008,38 @@
             box.className = 'status ' + type;
         }
 
-        function connectSource(config) {
+        async function connectSource(config) {
+            const btn = document.getElementById('connectButton');
+            btn.disabled = true;
+            btn.textContent = 'Connecting...';
+            showStatus('Verifying installation with GitHub API...', 'status');
+
+            if (config.id === 'github') {
+                try {
+                    const res = await fetch('/api/sources/github/connect', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showStatus('✓ GitHub verified and connected successfully! Redirecting...', 'status success');
+                        setTimeout(() => {
+                            window.location.href = '/dashboard.html?connection=success&provider=github';
+                        }, 500);
+                        return;
+                    } else if (data && data.error && !data.error.includes('No GitHub App installations found')) {
+                        showStatus(`Verification failed: ${data.error}`, 'error');
+                        btn.disabled = false;
+                        btn.textContent = 'Retry connection';
+                        return;
+                    }
+                } catch (err) {
+                    showStatus(`Connection check failed: ${err.message}`, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Retry connection';
+                    return;
+                }
+            }
             window.location.assign(`/auth/connect/${config.id === 'google-drive' ? 'google' : config.id}`);
         }
 
@@ -721,7 +1149,7 @@
             button.disabled = true;
             try {
                 for (const file of input.files) {
-                    if (file.size > 1024 * 1024) throw new Error(`${file.name} is larger than 1 MB.`);
+                    if (file.size > 2 * 1024 * 1024) throw new Error(`${file.name} is larger than 2 MB.`);
                     const content = await file.text();
                     const response = await fetch('/api/documents', {
                         method: 'POST',

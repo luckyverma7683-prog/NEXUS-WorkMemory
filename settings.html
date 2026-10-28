@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Settings & Preferences</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="nexus-theme.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            color-scheme: dark;
+            --bg-page: #070d17;
+            --bg-surface: #0e1726;
+            --bg-surface-raised: #142238;
+            --bg-card: rgba(16, 26, 44, 0.7);
+            --border: #22344d;
+            --border-hover: #3b5377;
+            --text-primary: #edf4fc;
+            --text-muted: #8fa2bd;
+            --accent: #00d4ff;
+            --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #0077ff 100%);
+            --accent-glow: rgba(0, 212, 255, 0.25);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.12);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-heading: 'Outfit', 'Inter', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        /* Preset themes */
+        [data-theme="midnight-oled"] {
+            --bg-page: #000000;
+            --bg-surface: #0a0a0f;
+            --bg-surface-raised: #12121a;
+            --bg-card: rgba(18, 18, 26, 0.85);
+            --border: #222230;
+            --border-hover: #3d3d52;
+            --accent: #a855f7;
+            --accent-gradient: linear-gradient(135deg, #c084fc 0%, #7e22ce 100%);
+            --accent-glow: rgba(168, 85, 247, 0.25);
+        }
+
+        [data-theme="matrix-emerald"] {
+            --bg-page: #030c07;
+            --bg-surface: #06170e;
+            --bg-surface-raised: #0b2316;
+            --bg-card: rgba(10, 31, 20, 0.8);
+            --border: #133a24;
+            --border-hover: #22603c;
+            --accent: #10b981;
+            --accent-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --accent-glow: rgba(16, 185, 129, 0.25);
+        }
+
+        [data-theme="solar-slate"] {
+            color-scheme: light;
+            --bg-page: #f1f5f9;
+            --bg-surface: #ffffff;
+            --bg-surface-raised: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --border: #cbd5e1;
+            --border-hover: #94a3b8;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --accent: #0284c7;
+            --accent-gradient: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            --accent-glow: rgba(2, 132, 199, 0.2);
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .settings-sidebar {
+            width: 290px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        /* ===== FLASHY MIRROR ANIMATED NEXUS LOGO ===== */
+        .nexus-brand-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0 1.25rem 0;
+            position: relative;
+            user-select: none;
+            width: 100%;
+            text-decoration: none;
+        }
+
+        .nexus-logo-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .nexus-flashy-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            line-height: 1;
+        }
+
+        .nexus-flashy-text {
+            font-family: 'Outfit', 'Inter', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            background: linear-gradient(
+                110deg,
+                var(--accent) 0%,
+                #ffffff 25%,
+                var(--accent) 50%,
+                #8ae8ff 75%,
+                var(--accent) 100%
+            );
+            background-size: 220% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: nexusFlashyShine 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            filter: drop-shadow(0 0 12px var(--accent-glow));
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.35);
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes nexusFlashyShine {
+            0% { background-position: 200% center; }
+            50% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+        }
+
+        /* Mirror reflection */
+        .nexus-mirror-reflection {
+            font-family: 'Outfit', 'Inter', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.35) 0%,
+                rgba(0, 212, 255, 0.2) 30%,
+                transparent 80%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scaleY(-0.65) translateY(-8px);
+            filter: blur(0.7px);
+            opacity: 0.5;
+            pointer-events: none;
+            margin-top: -8px;
+            height: 17px;
+            overflow: hidden;
+            user-select: none;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 85%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 85%);
+            animation: nexusMirrorPulse 3.6s ease-in-out infinite;
+        }
+
+        @keyframes nexusMirrorPulse {
+            0%, 100% { opacity: 0.45; filter: blur(0.8px); }
+            50% { opacity: 0.75; filter: blur(0.3px); }
+        }
+
+        /* ===== CUTE LITTLE ANIMATED BOT MASCOT ===== */
+        .nexus-bot-mascot {
+            position: relative;
+            width: 38px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            animation: botFloat 3.2s ease-in-out infinite;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+        }
+
+        .nexus-bot-mascot:hover {
+            transform: scale(1.18) rotate(5deg) translateY(-2px);
+        }
+
+        @keyframes botFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(-1.5deg); }
+        }
+
+        .bot-antenna {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            margin-bottom: -1px;
+        }
+
+        .antenna-orb {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent), 0 0 16px rgba(0, 255, 255, 0.8);
+            animation: orbPulse 1.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes orbPulse {
+            0% { transform: scale(0.85); box-shadow: 0 0 6px var(--accent); }
+            100% { transform: scale(1.3); box-shadow: 0 0 14px var(--accent), 0 0 22px rgba(0, 255, 255, 0.95); }
+        }
+
+        .antenna-stem {
+            width: 2px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .bot-head {
+            width: 30px;
+            height: 23px;
+            background: linear-gradient(145deg, #1f2e46, #0d1726);
+            border: 1.5px solid var(--border-hover);
+            border-radius: 8px 8px 7px 7px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            z-index: 2;
+        }
+
+        .bot-ear {
+            position: absolute;
+            width: 3.5px;
+            height: 9px;
+            background: var(--accent);
+            border-radius: 2px;
+            top: 5px;
+            box-shadow: 0 0 6px var(--accent);
+        }
+        .ear-left { left: -4px; }
+        .ear-right { right: -4px; }
+
+        .bot-visor {
+            width: 22px;
+            height: 14px;
+            background: #060a12;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 6px rgba(0, 212, 255, 0.3);
+        }
+
+        .bot-eye {
+            width: 4.5px;
+            height: 5.5px;
+            background: var(--accent);
+            border-radius: 40%;
+            box-shadow: 0 0 7px var(--accent);
+            animation: botBlink 4s ease-in-out infinite;
+            transition: all 0.2s ease;
+        }
+
+        @keyframes botBlink {
+            0%, 94%, 98%, 100% { transform: scaleY(1); }
+            96% { transform: scaleY(0.1); }
+        }
+
+        .nexus-bot-mascot:hover .bot-eye {
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            box-shadow: 0 0 10px #00ffff, 0 0 18px var(--accent);
+        }
+
+        .bot-blush {
+            position: absolute;
+            width: 3.5px;
+            height: 2px;
+            background: #ff5e97;
+            border-radius: 50%;
+            bottom: 1.5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 0 4px #ff5e97;
+        }
+        .blush-left { left: 2.5px; }
+        .blush-right { right: 2.5px; }
+
+        .nexus-bot-mascot:hover .bot-blush {
+            opacity: 0.9;
+        }
+
+        .bot-body {
+            width: 17px;
+            height: 9px;
+            background: linear-gradient(145deg, #18253a, #0b1320);
+            border: 1.5px solid var(--border-hover);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-top: -1px;
+            z-index: 1;
+        }
+
+        .bot-core-gem {
+            width: 4.5px;
+            height: 4.5px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent);
+            animation: gemPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes gemPulse {
+            0%, 100% { opacity: 0.6; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        .bot-hover-shadow {
+            width: 20px;
+            height: 4px;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.4) 0%, transparent 75%);
+            border-radius: 50%;
+            position: absolute;
+            bottom: -5px;
+            animation: botShadow 3.2s ease-in-out infinite;
+        }
+
+        @keyframes botShadow {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(0.7); opacity: 0.25; }
+        }
+
+        .bot-speech-bubble {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 8px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-glow);
+        }
+
+        .bot-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid var(--accent);
+        }
+
+        .nexus-bot-mascot:hover .bot-speech-bubble,
+        .nexus-bot-mascot.chatty .bot-speech-bubble {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .nav-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-back-btn:hover {
+            border-color: var(--accent);
+            transform: translateX(-2px);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin: 0.8rem 0 0.5rem 0.5rem;
+        }
+
+        .tab-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            color: var(--text-primary);
+            background: var(--bg-surface-raised);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+            font-weight: 600;
+        }
+
+        .tab-icon {
+            font-size: 1.15rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 0.85rem;
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: #040914;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .user-details {
+            flex: 1;
+            margin-left: 0.65rem;
+            overflow: hidden;
+        }
+
+        .user-name-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-email-text {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logout-link-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.3rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: background 0.2s;
+        }
+
+        .logout-link-btn:hover {
+            background: var(--danger-bg);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .settings-main {
+            margin-left: 290px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Topbar */
+        .settings-topbar {
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(14, 23, 38, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb-current {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .save-all-btn {
+            background: var(--accent-gradient);
+            color: #040914;
+            border: none;
+            padding: 0.65rem 1.4rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-main);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .save-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .save-all-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== CONTENT BODY ===== */
+        .settings-content {
+            padding: 2.5rem;
+            max-width: 1040px;
+            width: 100%;
+        }
+
+        .panel-header {
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-family: var(--font-heading);
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .panel-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* Tab Panels */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 1.75rem;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 1.35rem;
+        }
+
+        /* Form elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.45rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-textarea {
+            font-family: var(--font-code);
+            font-size: 0.88rem;
+            resize: vertical;
+            min-height: 110px;
+            line-height: 1.6;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .form-input[readonly] {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .input-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+
+        /* Model Cards Grid */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .model-card {
+            background: var(--bg-surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .model-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .model-card.active {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .model-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent);
+        }
+
+        .model-name {
+            font-family: var(--font-code);
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .model-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Slider */
+        .slider-wrapper {
+            margin: 1.5rem 0 1rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-value-pill {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border);
+            color: var(--accent);
+        }
+
+        .custom-range {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-surface-raised);
+            outline: none;
+            -webkit-appearance: none;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+        }
+
+        /* Toggle switches */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info {
+            flex: 1;
+            padding-right: 1.5rem;
+        }
+
+        .toggle-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .toggle-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-surface-raised);
+            border: 1px solid var(--border);
+            transition: .3s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            background-color: #040914;
+        }
+
+        /* Theme preset cards */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .theme-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            cursor: pointer;
+            background: var(--bg-surface);
+            transition: all 0.2s;
+        }
+
+        .theme-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .theme-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .theme-preview-box {
+            height: 65px;
+            border-radius: 8px;
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-preview-box::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 30%;
+            background: inherit;
+            filter: brightness(1.5);
+        }
+
+        .theme-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .theme-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: var(--font-heading);
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Buttons */
+        .action-btn {
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .danger-btn {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger);
+            color: #fca5a5;
+        }
+
+        .danger-btn:hover {
+            background: var(--danger);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Preset Chips */
+        .preset-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .preset-chip {
+            font-size: 0.78rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 100px;
+            background: var(--bg-surface-raised);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-chip:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 0.85rem 1.25rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            min-width: 280px;
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="settings-sidebar">
+        <a href="/dashboard.html" class="nexus-brand-wrapper">
+            <div class="nexus-logo-group">
+                <!-- Cute Animated Bot Mascot Showpiece -->
+                <div class="nexus-bot-mascot" id="nexusSettingsBot" title="Hi, I'm NEXUS! Click me ✨">
+                    <div class="bot-antenna">
+                        <div class="antenna-orb"></div>
+                        <div class="antenna-stem"></div>
+                    </div>
+                    <div class="bot-head">
+                        <div class="bot-ear ear-left"></div>
+                        <div class="bot-ear ear-right"></div>
+                        <div class="bot-visor">
+                            <div class="bot-eye eye-left"></div>
+                            <div class="bot-eye eye-right"></div>
+                            <div class="bot-blush blush-left"></div>
+                            <div class="bot-blush blush-right"></div>
+                        </div>
+                    </div>
+                    <div class="bot-body">
+                        <div class="bot-core-gem"></div>
+                    </div>
+                    <div class="bot-hover-shadow"></div>
+                    <div class="bot-speech-bubble">Settings! ✨</div>
+                </div>
+
+                <!-- Flashy Mirror Animated Name -->
+                <div class="nexus-flashy-container">
+                    <span class="nexus-flashy-text">NEXUS</span>
+                    <span class="nexus-mirror-reflection" aria-hidden="true">NEXUS</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="/dashboard.html" class="nav-back-btn">
+            <span>←</span> Back to Workspace
+        </a>
+
+        <div class="sidebar-section-title">Preferences</div>
+        <nav class="tab-menu">
+            <button class="tab-btn active" data-tab="profile">
+                <span class="tab-icon">👤</span> Profile & Security
+            </button>
+            <button class="tab-btn" data-tab="ai">
+                <span class="tab-icon">🤖</span> AI Engine & Models
+            </button>
+            <button class="tab-btn" data-tab="memory">
+                <span class="tab-icon">🧠</span> Work Memory & Context
+            </button>
+            <button class="tab-btn" data-tab="appearance">
+                <span class="tab-icon">🎨</span> Appearance & UI
+            </button>
+            <button class="tab-btn" data-tab="data">
+                <span class="tab-icon">📦</span> Data & Backups
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile-badge">
+                <div class="user-avatar" id="sidebarAvatar">U</div>
+                <div class="user-details">
+                    <div class="user-name-text" id="sidebarUserName">User</div>
+                    <div class="user-email-text" id="sidebarUserEmail">user@nexus.ai</div>
+                </div>
+                <button class="logout-link-btn" onclick="handleLogout()">Exit</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN SETTINGS AREA -->
+    <main class="settings-main">
+        <!-- TOPBAR -->
+        <header class="settings-topbar">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">NEXUS</a>
+                <span>/</span>
+                <span>Settings</span>
+                <span>/</span>
+                <span class="breadcrumb-current" id="breadcrumbActiveTab">Profile & Security</span>
+            </div>
+            <div class="topbar-actions">
+                <div class="sync-status" id="syncStatusIndicator">
+                    <span class="sync-dot"></span>
+                    <span id="syncStatusLabel">Cloud Synced</span>
+                </div>
+                <button class="save-all-btn" id="saveAllBtn" onclick="saveActiveSettings()">
+                    <span>💾</span> Save Changes
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT BODY -->
+        <div class="settings-content">
+
+            <!-- TAB 1: PROFILE & SECURITY -->
+            <div class="tab-panel active" id="panel-profile">
+                <div class="panel-header">
+                    <h1 class="panel-title">Profile & Security</h1>
+                    <p class="panel-description">Manage your identity credentials, update passwords, and inspect cryptographic vault keys.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">User Account</div>
+                    <p class="card-desc">Your workspace data and permanent team memories are securely scoped to this profile.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="profileNameInput">Full Name</label>
+                            <input class="form-input" id="profileNameInput" type="text" placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="profileEmailInput">Email Address</label>
+                            <input class="form-input" id="profileEmailInput" type="email" readonly>
+                            <div class="input-hint">Verified account email (used for session encryption)</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button class="action-btn" type="button" onclick="updateProfileName()">
+                            <span>✓</span> Update Name
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Update Password</div>
+                    <p class="card-desc">Password must be between 10 and 128 characters. Hashed using scrypt with unique salts.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="currPasswordInput">Current Password</label>
+                        <input class="form-input" id="currPasswordInput" type="password" placeholder="Enter current password">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="newPasswordInput">New Password</label>
+                            <input class="form-input" id="newPasswordInput" type="password" placeholder="At least 10 characters">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPasswordInput">Confirm New Password</label>
+                            <input class="form-input" id="confirmPasswordInput" type="password" placeholder="Re-enter new password">
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button class="action-btn" type="button" onclick="updatePassword()">
+                            <span>🔐</span> Change Password
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Encryption & Hardware Security</div>
+                    <p class="card-desc">Hardware-backed zero-knowledge architecture protecting workspace documents and third-party tokens.</p>
+
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
+                        <div class="stat-box" style="text-align:left;">
+                            <div style="font-size:0.8rem; color:var(--text-muted);">ENCRYPTION CIPHER</div>
+                            <div style="font-family:var(--font-code); font-weight:700; color:var(--accent); margin-top:0.3rem;">AES-256-GCM</div>
+                        </div>
+                        <div class="stat-box" style="text-align:left;">
+                            <div style="font-size:0.8rem; color:var(--text-muted);">KEY DERIVATION</div>
+                            <div style="font-family:var(--font-code); font-weight:700; color:var(--success); margin-top:0.3rem;">scrypt 64-Byte Salt</div>
+                        </div>
+                        <div class="stat-box" style="text-align:left;">
+                            <div style="font-size:0.8rem; color:var(--text-muted);">INTEGRATION KEYS</div>
+                            <div style="font-family:var(--font-code); font-weight:700; color:var(--text-primary); margin-top:0.3rem;">Zero-Leak Protected</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AI ENGINE & MODELS -->
+            <div class="tab-panel" id="panel-ai">
+                <div class="panel-header">
+                    <h1 class="panel-title">AI Engine & Models</h1>
+                    <p class="panel-description">Configure your preferred Google Gemini model, fine-tune temperature, and personalize system prompt instructions.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <span>Preferred Gemini Model</span>
+                        <span id="geminiKeyBadge" style="font-size:0.75rem; padding:0.2rem 0.6rem; border-radius:100px; background:var(--success-bg); color:var(--success); border:1px solid var(--success);">API Key Connected ✓</span>
+                    </div>
+                    <p class="card-desc">NEXUS prioritizes your chosen model for all streaming chat and document reasoning, with seamless fallback resilience.</p>
+
+                    <div class="model-grid">
+                        <div class="model-card active" data-model="gemini-3.8-flash" onclick="selectModel('gemini-3.8-flash')">
+                            <span class="model-badge">RECOMMENDED</span>
+                            <div class="model-name">gemini-3.8-flash</div>
+                            <div class="model-desc">State-of-the-art speed, adaptive multi-token reasoning, and high throughput.</div>
+                        </div>
+                        <div class="model-card" data-model="gemini-3.6-flash" onclick="selectModel('gemini-3.6-flash')">
+                            <div class="model-name">gemini-3.6-flash</div>
+                            <div class="model-desc">Balanced architectural reasoning with consistent deep workspace synthesis.</div>
+                        </div>
+                        <div class="model-card" data-model="gemini-3.5-flash" onclick="selectModel('gemini-3.5-flash')">
+                            <div class="model-name">gemini-3.5-flash</div>
+                            <div class="model-desc">Reliable production-grade intelligence across documents and repositories.</div>
+                        </div>
+                        <div class="model-card" data-model="gemini-2.5-flash-lite" onclick="selectModel('gemini-2.5-flash-lite')">
+                            <span class="model-badge">FASTEST</span>
+                            <div class="model-name">gemini-2.5-flash-lite</div>
+                            <div class="model-desc">Ultra-low latency responses optimized for quick question-and-answer loops.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Creativity & Precision (Temperature)</div>
+                    <p class="card-desc">Lower values yield deterministic, syntax-accurate code; higher values encourage innovative and creative insights.</p>
+
+                    <div class="slider-wrapper">
+                        <div class="slider-header">
+                            <span style="font-size:0.9rem; font-weight:600;">Response Precision</span>
+                            <span class="slider-value-pill" id="tempDisplay">0.7 (Balanced)</span>
+                        </div>
+                        <input class="custom-range" id="tempRange" type="range" min="0" max="1" step="0.05" value="0.7" oninput="updateTempDisplay(this.value)">
+                        <div class="slider-labels">
+                            <span>0.0 Strict & Code-Accurate</span>
+                            <span>0.5 Balanced Technical</span>
+                            <span>1.0 Highly Creative</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Custom AI Persona & Instructions</div>
+                    <p class="card-desc">Injected directly into NEXUS's system instructions. Specify your preferred coding languages, concise formatting, or team habits.</p>
+
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="customInstructionsInput" placeholder="e.g. Always respond with modern TypeScript and concise bullet points. Cite file names explicitly and avoid unnecessary boilerplate."></textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="preset-chips">
+                            <span style="font-size:0.78rem; color:var(--text-muted); align-self:center;">Presets:</span>
+                            <span class="preset-chip" onclick="applyPromptPreset('architect')">Software Architect</span>
+                            <span class="preset-chip" onclick="applyPromptPreset('concise')">Concise Bulleted</span>
+                            <span class="preset-chip" onclick="applyPromptPreset('mentor')">Pair Programmer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Chat Conversation Memory Depth</div>
+                    <p class="card-desc">Number of previous dialogue turns preserved in active AI working context.</p>
+
+                    <div class="slider-wrapper">
+                        <div class="slider-header">
+                            <span style="font-size:0.9rem; font-weight:600;">Context History Turns</span>
+                            <span class="slider-value-pill" id="historyTurnsDisplay">10 Turns</span>
+                        </div>
+                        <input class="custom-range" id="historyTurnsRange" type="range" min="4" max="25" step="1" value="10" oninput="updateHistoryDisplay(this.value)">
+                        <div class="slider-labels">
+                            <span>4 Turns (Fast & Focused)</span>
+                            <span>15 Turns (Deep Memory)</span>
+                            <span>25 Turns (Maximum Context)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: WORK MEMORY & CONTEXT -->
+            <div class="tab-panel" id="panel-memory">
+                <div class="panel-header">
+                    <h1 class="panel-title">Work Memory & Context</h1>
+                    <p class="panel-description">Configure the persistent Work Memory Vault that retains architectural rules, tech-stack choices, and team decisions.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Default Context Scope</div>
+                    <p class="card-desc">Select which sources NEXUS analyzes automatically when you submit questions without explicit mentions.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="defaultContextSelect">Primary Knowledge Scope</label>
+                        <select class="form-select" id="defaultContextSelect">
+                            <option value="all">🌐 All Sources (Connected Documents, GitHub, Drive, Notion, Slack)</option>
+                            <option value="documents">📄 Uploaded Documents & Code Only</option>
+                            <option value="github">🐙 GitHub Repositories Only</option>
+                            <option value="google-drive">📁 Google Drive Files Only</option>
+                            <option value="slack">💬 Slack Discussions Only</option>
+                            <option value="notion">📝 Notion Workspace Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Vault Behaviors & Synthesis</div>
+                    <p class="card-desc">Control how permanent team memory items interact with live generation.</p>
+
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <div class="toggle-title">Include Permanent Memories in Every Query</div>
+                            <div class="toggle-desc">Automatically inject team decisions, coding standards, and pinned architecture rules into assistant prompts.</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="includeMemoriesToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <div class="toggle-title">Auto-Detect Architectural Decisions</div>
+                            <div class="toggle-desc">Encourage the assistant to highlight recurring decisions and offer one-click saving to permanent team memory.</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="autoExtractMemoriesToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Work Memory Vault Statistics</div>
+                    <p class="card-desc">Live inventory of memories stored securely in local SQLite with fast indexed retrieval.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-num" id="statMemoriesCount">0</div>
+                            <div class="stat-name">Permanent Memories</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="statDocumentsCount">0</div>
+                            <div class="stat-name">Encrypted Files</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="statIntegrationsCount">0</div>
+                            <div class="stat-name">Connected Tools</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                        <a href="/dashboard.html#memory" class="action-btn" style="text-decoration:none;">
+                            <span>🧠</span> Manage Memories in Workspace ➔
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: APPEARANCE & UI -->
+            <div class="tab-panel" id="panel-appearance">
+                <div class="panel-header">
+                    <h1 class="panel-title">Appearance & UI</h1>
+                    <p class="panel-description">Customize the visual aesthetic, typography sizing, and streaming animation parameters.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Color Theme Presets</div>
+                    <p class="card-desc">Select your preferred cyberpunk or clean contrast visual system.</p>
+
+                    <div class="theme-grid">
+                        <div class="theme-card active" data-theme="cyber-nexus" onclick="selectTheme('cyber-nexus')">
+                            <div class="theme-preview-box" style="background:#070d17; color:#00d4ff; border:1px solid #22344d;">
+                                Cyber Nexus
+                            </div>
+                            <div class="theme-title">🌌 Cyber Nexus</div>
+                            <div class="theme-meta">Default space navy with glowing cyan</div>
+                        </div>
+
+                        <div class="theme-card" data-theme="midnight-oled" onclick="selectTheme('midnight-oled')">
+                            <div class="theme-preview-box" style="background:#000000; color:#c084fc; border:1px solid #222230;">
+                                Midnight OLED
+                            </div>
+                            <div class="theme-title">🖤 Midnight OLED</div>
+                            <div class="theme-meta">True pitch black with vibrant violet</div>
+                        </div>
+
+                        <div class="theme-card" data-theme="matrix-emerald" onclick="selectTheme('matrix-emerald')">
+                            <div class="theme-preview-box" style="background:#030c07; color:#34d399; border:1px solid #133a24;">
+                                Matrix Emerald
+                            </div>
+                            <div class="theme-title">🧪 Matrix Emerald</div>
+                            <div class="theme-meta">Obsidian dark with matrix neon green</div>
+                        </div>
+
+                        <div class="theme-card" data-theme="solar-slate" onclick="selectTheme('solar-slate')">
+                            <div class="theme-preview-box" style="background:#f1f5f9; color:#0284c7; border:1px solid #cbd5e1;">
+                                Solar Slate
+                            </div>
+                            <div class="theme-title">☀️ Solar Slate</div>
+                            <div class="theme-meta">High-contrast daytime slate white</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Typography & Code Blocks</div>
+                    <p class="card-desc">Configure code syntax highlighting, line numbers, and interface font scales.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="fontSizeSelect">Interface Font Scale</label>
+                            <select class="form-select" id="fontSizeSelect">
+                                <option value="compact">Compact (High density)</option>
+                                <option value="standard" selected>Standard (Balanced)</option>
+                                <option value="comfortable">Comfortable (Relaxed reading)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="codeThemeSelect">Code Syntax Theme</label>
+                            <select class="form-select" id="codeThemeSelect">
+                                <option value="github-dark" selected>GitHub Dark</option>
+                                <option value="dracula">Dracula Dark</option>
+                                <option value="nord">Nord Arctic</option>
+                                <option value="one-dark">Atom One Dark</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <div class="toggle-title">Show Line Numbers on Code Snippets</div>
+                            <div class="toggle-desc">Display line indices on generated code blocks for effortless reference.</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="codeLineNumbersToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <div class="toggle-title">Smooth Streaming Animation</div>
+                            <div class="toggle-desc">Render tokens with a smooth typewriter cadence and blinking cyan cursor.</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="streamAnimationToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: DATA & BACKUPS -->
+            <div class="tab-panel" id="panel-data">
+                <div class="panel-header">
+                    <h1 class="panel-title">Data Management & Backups</h1>
+                    <p class="panel-description">Export your complete workspace as structured JSON, download your team memories in Markdown, or manage data retention.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Workspace Data Export</div>
+                    <p class="card-desc">Download an offline, portable archive containing all conversations, full chat transcripts, permanent memories, and document indices.</p>
+
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                        <button class="action-btn" type="button" onclick="exportFullWorkspace()">
+                            <span>📥</span> Export Full Workspace (.json)
+                        </button>
+                        <button class="action-btn" type="button" onclick="exportMemoriesMarkdown()">
+                            <span>📝</span> Export Work Memories (.md)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Workspace Inventory</div>
+                    <p class="card-desc">Total storage footprint managed securely inside your private SQLite database.</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-num" id="statConversations">0</div>
+                            <div class="stat-name">Conversations</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="statMessages">0</div>
+                            <div class="stat-name">Messages Logged</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="statMemories">0</div>
+                            <div class="stat-name">Work Memories</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="statDocs">0</div>
+                            <div class="stat-name">Files Ingested</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.03);">
+                    <div class="card-title" style="color:var(--danger);">⚠️ Danger Zone</div>
+                    <p class="card-desc">Actions here permanently erase data from your private database. These operations cannot be undone.</p>
+
+                    <div style="display:flex; flex-direction:column; gap:1rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.06);">
+                            <div>
+                                <div style="font-weight:600; font-size:0.92rem;">Clear Chat Conversations</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Deletes all chat conversations and messages. Retains permanent Work Memories and documents.</div>
+                            </div>
+                            <button class="action-btn danger-btn" type="button" onclick="clearDataTarget('chats')">Clear Chats</button>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.06);">
+                            <div>
+                                <div style="font-weight:600; font-size:0.92rem;">Purge Work Memories</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Deletes all pinned and recorded team decisions, architecture rules, and meeting notes.</div>
+                            </div>
+                            <button class="action-btn danger-btn" type="button" onclick="clearDataTarget('memories')">Purge Memories</button>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.06);">
+                            <div>
+                                <div style="font-weight:600; font-size:0.92rem;">Delete Ingested Documents</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Removes all uploaded documents and source code files from the local encrypted vault.</div>
+                            </div>
+                            <button class="action-btn danger-btn" type="button" onclick="clearDataTarget('documents')">Delete Files</button>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700; font-size:0.92rem; color:var(--danger);">Factory Reset Workspace</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Completely wipes all conversations, messages, permanent memories, and uploaded files for this account.</div>
+                            </div>
+                            <button class="action-btn danger-btn" style="background:var(--danger); color:#fff;" type="button" onclick="clearDataTarget('all')">Reset All Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // State
+        let currentSettings = {
+            ai: {
+                model: 'gemini-3.8-flash',
+                temperature: 0.7,
+                customInstructions: '',
+                maxHistoryTurns: 10,
+                includeMemories: true
+            },
+            workspace: {
+                defaultContext: 'all',
+                autoExtractMemories: true,
+                streamSpeed: 'smooth'
+            },
+            appearance: {
+                theme: 'cyber-nexus',
+                codeTheme: 'github-dark',
+                codeLineNumbers: true,
+                fontSize: 'standard'
+            },
+            notifications: {
+                soundEffects: false,
+                autoScroll: true
+            }
+        };
+
+        let currentMeta = null;
+        let isSaving = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            initTabs();
+            await loadSettings();
+        });
+
+        // Tabs setup
+        function initTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.dataset.tab;
+                    switchTab(targetTab);
+                });
+            });
+
+            // Check URL hash
+            const hash = window.location.hash.replace('#', '');
+            if (['profile', 'ai', 'memory', 'appearance', 'data'].includes(hash)) {
+                switchTab(hash);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === `panel-${tabId}`);
+            });
+
+            const titles = {
+                profile: 'Profile & Security',
+                ai: 'AI Engine & Models',
+                memory: 'Work Memory & Context',
+                appearance: 'Appearance & UI',
+                data: 'Data & Backups'
+            };
+            document.getElementById('breadcrumbActiveTab').textContent = titles[tabId] || 'Settings';
+            window.location.hash = tabId;
+        }
+
+        // Fetch settings from server
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.status === 401) {
+                    window.location.href = '/home.html';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed to load settings');
+                const data = await res.json();
+                currentSettings = data.settings || currentSettings;
+                currentMeta = data.meta;
+
+                populateUI();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        function populateUI() {
+            if (currentMeta) {
+                const user = currentMeta.user || {};
+                document.getElementById('sidebarUserName').textContent = user.name || 'User';
+                document.getElementById('sidebarUserEmail').textContent = user.email || 'user@nexus.ai';
+                document.getElementById('sidebarAvatar').textContent = (user.name || user.email || 'U')[0].toUpperCase();
+                document.getElementById('profileNameInput').value = user.name || '';
+                document.getElementById('profileEmailInput').value = user.email || '';
+
+                const stats = currentMeta.stats || {};
+                document.getElementById('statMemoriesCount').textContent = stats.memories || 0;
+                document.getElementById('statDocumentsCount').textContent = stats.documents || 0;
+                document.getElementById('statIntegrationsCount').textContent = (stats.integrations || []).length;
+                document.getElementById('statConversations').textContent = stats.conversations || 0;
+                document.getElementById('statMessages').textContent = stats.messages || 0;
+                document.getElementById('statMemories').textContent = stats.memories || 0;
+                document.getElementById('statDocs').textContent = stats.documents || 0;
+
+                const geminiBadge = document.getElementById('geminiKeyBadge');
+                if (currentMeta.geminiConfigured) {
+                    geminiBadge.textContent = 'API Key Connected ✓';
+                    geminiBadge.style.color = 'var(--success)';
+                } else {
+                    geminiBadge.textContent = 'Key Missing in .env';
+                    geminiBadge.style.color = 'var(--warning)';
+                }
+            }
+
+            // AI settings
+            const ai = currentSettings.ai || {};
+            selectModel(ai.model || 'gemini-3.8-flash', false);
+            document.getElementById('tempRange').value = ai.temperature !== undefined ? ai.temperature : 0.7;
+            updateTempDisplay(document.getElementById('tempRange').value);
+            document.getElementById('customInstructionsInput').value = ai.customInstructions || '';
+            document.getElementById('historyTurnsRange').value = ai.maxHistoryTurns || 10;
+            updateHistoryDisplay(document.getElementById('historyTurnsRange').value);
+
+            // Workspace & Memory
+            const ws = currentSettings.workspace || {};
+            document.getElementById('defaultContextSelect').value = ws.defaultContext || 'all';
+            document.getElementById('includeMemoriesToggle').checked = ai.includeMemories !== false;
+            document.getElementById('autoExtractMemoriesToggle').checked = ws.autoExtractMemories !== false;
+
+            // Appearance
+            const app = currentSettings.appearance || {};
+            selectTheme(app.theme || 'cyber-nexus', false);
+            document.getElementById('fontSizeSelect').value = app.fontSize || 'standard';
+            document.getElementById('codeThemeSelect').value = app.codeTheme || 'github-dark';
+            document.getElementById('codeLineNumbersToggle').checked = app.codeLineNumbers !== false;
+            document.getElementById('streamAnimationToggle').checked = ws.streamSpeed !== 'instant';
+
+            setSyncStatus('Cloud Synced');
+        }
+
+        // Select Model
+        function selectModel(modelName, markDirty = true) {
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.model === modelName);
+            });
+            currentSettings.ai.model = modelName;
+            if (markDirty) setSyncStatus('Unsaved Changes', true);
+        }
+
+        function updateTempDisplay(val) {
+            const num = parseFloat(val).toFixed(2);
+            let desc = 'Balanced';
+            if (num < 0.3) desc = 'Code Accurate';
+            else if (num < 0.6) desc = 'Balanced Technical';
+            else if (num < 0.85) desc = 'Creative Reasoning';
+            else desc = 'Exploratory';
+            document.getElementById('tempDisplay').textContent = `${num} (${desc})`;
+            currentSettings.ai.temperature = parseFloat(num);
+            setSyncStatus('Unsaved Changes', true);
+        }
+
+        function updateHistoryDisplay(val) {
+            document.getElementById('historyTurnsDisplay').textContent = `${val} Turns`;
+            currentSettings.ai.maxHistoryTurns = parseInt(val, 10);
+            setSyncStatus('Unsaved Changes', true);
+        }
+
+        function applyPromptPreset(preset) {
+            const input = document.getElementById('customInstructionsInput');
+            if (preset === 'architect') {
+                input.value = "You are a Principal Software Architect. Provide modular, production-ready code with clean TypeScript or Python syntax. Emphasize performance, security, and scalability tradeoffs. Cite file references clearly.";
+            } else if (preset === 'concise') {
+                input.value = "Always give concise, direct answers. Use bullet points and minimal boilerplate code. Avoid conversational fillers.";
+            } else if (preset === 'mentor') {
+                input.value = "Act as an experienced pair programming mentor. Explain the reasoning behind architectural decisions, provide commented code snippets, and offer proactive debugging advice.";
+            }
+            setSyncStatus('Unsaved Changes', true);
+            showToast('Prompt preset applied!', 'success');
+        }
+
+        // Theme selection
+        function selectTheme(themeName, markDirty = true) {
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.theme === themeName);
+            });
+            if (!currentSettings.appearance) currentSettings.appearance = {};
+            currentSettings.appearance.theme = themeName;
+            if (window.applyNexusSettings) {
+                window.applyNexusSettings(currentSettings, true);
+            } else {
+                document.documentElement.setAttribute('data-theme', themeName);
+                localStorage.setItem('nexus-theme', themeName);
+                localStorage.setItem('nexusTheme', themeName);
+            }
+            if (markDirty) setSyncStatus('Unsaved Changes', true);
+        }
+
+        function setSyncStatus(text, dirty = false) {
+            const label = document.getElementById('syncStatusLabel');
+            const dot = document.querySelector('.sync-dot');
+            label.textContent = text;
+            if (dirty) {
+                label.style.color = 'var(--warning)';
+                dot.style.background = 'var(--warning)';
+                dot.style.boxShadow = '0 0 8px var(--warning)';
+            } else {
+                label.style.color = 'var(--success)';
+                dot.style.background = 'var(--success)';
+                dot.style.boxShadow = '0 0 8px var(--success)';
+            }
+        }
+
+        // Save active settings
+        async function saveActiveSettings() {
+            if (isSaving) return;
+            const btn = document.getElementById('saveAllBtn');
+            isSaving = true;
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Saving...';
+
+            try {
+                // Collect form fields
+                currentSettings.ai.customInstructions = document.getElementById('customInstructionsInput').value.trim();
+                currentSettings.ai.includeMemories = document.getElementById('includeMemoriesToggle').checked;
+                currentSettings.workspace.defaultContext = document.getElementById('defaultContextSelect').value;
+                currentSettings.workspace.autoExtractMemories = document.getElementById('autoExtractMemoriesToggle').checked;
+                currentSettings.workspace.streamSpeed = document.getElementById('streamAnimationToggle').checked ? 'smooth' : 'instant';
+                currentSettings.appearance.fontSize = document.getElementById('fontSizeSelect').value;
+                currentSettings.appearance.codeTheme = document.getElementById('codeThemeSelect').value;
+                currentSettings.appearance.codeLineNumbers = document.getElementById('codeLineNumbersToggle').checked;
+
+                // Sync immediately across all pages/tabs via nexus-theme
+                if (window.applyNexusSettings) {
+                    window.applyNexusSettings(currentSettings, true);
+                }
+
+                const res = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ settings: currentSettings })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Failed to save settings');
+                }
+
+                setSyncStatus('Cloud Synced');
+                showToast('All settings successfully saved & applied across NEXUS!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                isSaving = false;
+                btn.disabled = false;
+                btn.innerHTML = '<span>💾</span> Save Changes';
+            }
+        }
+
+        // Update profile display name
+        async function updateProfileName() {
+            const newName = document.getElementById('profileNameInput').value.trim();
+            if (newName.length < 2) {
+                showToast('Name must be at least 2 characters.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/settings/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Could not update name');
+
+                document.getElementById('sidebarUserName').textContent = data.name;
+                document.getElementById('sidebarAvatar').textContent = data.name[0].toUpperCase();
+                showToast('Profile name updated successfully!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Update password
+        async function updatePassword() {
+            const currentPassword = document.getElementById('currPasswordInput').value;
+            const newPassword = document.getElementById('newPasswordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+            if (!currentPassword) {
+                showToast('Please enter your current password.', 'error');
+                return;
+            }
+            if (newPassword.length < 10) {
+                showToast('New password must be at least 10 characters.', 'error');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showToast('New passwords do not match.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/settings/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Password change failed');
+
+                document.getElementById('currPasswordInput').value = '';
+                document.getElementById('newPasswordInput').value = '';
+                document.getElementById('confirmPasswordInput').value = '';
+                showToast('Password changed successfully!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Export Full Workspace
+        async function exportFullWorkspace() {
+            showToast('Preparing workspace archive...', 'success');
+            try {
+                const res = await fetch('/api/settings/export', { method: 'POST' });
+                if (!res.ok) throw new Error('Export failed');
+                const data = await res.json();
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `nexus-workspace-export-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Workspace export downloaded!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Export Memories as Markdown
+        async function exportMemoriesMarkdown() {
+            showToast('Generating Work Memory Markdown...', 'success');
+            try {
+                const res = await fetch('/api/memories');
+                if (!res.ok) throw new Error('Could not fetch memories');
+                const data = await res.json();
+                const list = data.memories || [];
+
+                let md = `# NEXUS Work Memory Vault\nExported on: ${new Date().toLocaleString()}\n\n`;
+                if (!list.length) {
+                    md += `*No permanent memories recorded yet.*\n`;
+                } else {
+                    list.forEach((m, idx) => {
+                        md += `## ${idx + 1}. [${m.category.toUpperCase()}] ${m.title} ${m.pinned ? '📌' : ''}\n`;
+                        md += `*Recorded on: ${new Date(m.created_at).toLocaleString()}*\n\n`;
+                        md += `${m.content}\n\n---\n\n`;
+                    });
+                }
+
+                const blob = new Blob([md], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `nexus-work-memories-${Date.now()}.md`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Memories Markdown downloaded!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Clear target data
+        async function clearDataTarget(target) {
+            const messages = {
+                chats: 'Are you sure you want to delete ALL chat conversations? Your permanent Work Memories and files will be kept.',
+                memories: 'Are you sure you want to delete ALL permanent team memories? This cannot be undone.',
+                documents: 'Are you sure you want to delete all uploaded vault documents?',
+                all: 'WARNING: Are you absolutely sure you want to FACTORY RESET your entire workspace? All chats, permanent memories, and files will be permanently erased.'
+            };
+
+            if (!confirm(messages[target] || 'Are you sure you want to delete this data?')) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/settings/clear', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to clear data');
+
+                showToast(`Data successfully cleared: ${target}`, 'success');
+                await loadSettings();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Logout
+        async function handleLogout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+            } catch {}
+            window.location.href = '/home.html';
+        }
+
+        // Toast Helper
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✓' : '⚠️';
+            toast.innerHTML = `<span style="font-weight:bold;">${icon}</span> <span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
